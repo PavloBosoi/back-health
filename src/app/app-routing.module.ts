@@ -6,8 +6,12 @@ import { ROUTES } from './routes.constants';
 const routes: Routes = [
     {
         path: '',
-        redirectTo: ROUTES.COURSES,
+        redirectTo: ROUTES.LOGIN,
         pathMatch: 'full'
+    },
+    {
+        path: ROUTES.LOGIN, loadChildren: () => import('./pages/login/login.module').then(m => m.LoginModule),
+        /*resolve: {recipes: RecipesResolver}*/
     },
     {
         path: ROUTES.COURSES, loadChildren: () => import('./pages/courses/courses.module').then(m => m.CoursesModule),

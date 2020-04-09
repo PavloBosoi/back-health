@@ -1,0 +1,16 @@
+<form class="example-form" [formGroup]="form" (submit)="submitForm()">
+    <mat-form-field class="example-full-width">
+        <input matInput
+               placeholder="Email"
+               [formControl]="email"
+        >
+    </mat-form-field><br/>
+    <mat-form-field class="example-full-width">
+        <input matInput
+               placeholder="Password"
+               type="password"
+               [formControl]="password"
+        >
+    </mat-form-field>
+    <button type="submit" [disabled]="form.invalid" mat-raised-button color="primary">Login</button>
+</form>
