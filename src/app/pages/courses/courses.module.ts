@@ -9,6 +9,7 @@ import { MatInputModule } from '@angular/material/input';
 import { CoursesComponent } from './courses.component';
 import { CoursesRoutingModule } from './courses-routing.module';
 import { CreateCourseComponent } from './modals/create-course/create-course.component';
+import { A11yModule } from '@angular/cdk/a11y';
 
 @NgModule({
     declarations: [CoursesComponent, CreateCourseComponent],
@@ -19,7 +20,8 @@ import { CreateCourseComponent } from './modals/create-course/create-course.comp
         MatButtonModule,
         MatDialogModule,
         MatFormFieldModule,
-        MatInputModule
+        MatInputModule,
+        A11yModule
     ]
 })
 export class CoursesModule { }

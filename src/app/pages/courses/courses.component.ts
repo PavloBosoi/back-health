@@ -3,6 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 
 import { CreateCourseComponent } from './modals/create-course/create-course.component';
 import { ICourse } from '../../core/domain/icourse';
+import { CoursesService } from '../../core/services/courses/courses.service';
 
 @Component({
     selector: 'app-courses',
@@ -10,21 +11,33 @@ import { ICourse } from '../../core/domain/icourse';
     styleUrls: ['./courses.component.scss']
 })
 export class CoursesComponent implements OnInit {
+    public courses: ICourse[];
     private courseName: string;
 
-    constructor(public dialog: MatDialog) { }
+    constructor(
+        public dialog: MatDialog,
+        private coursesService: CoursesService
+    ) { }
 
     ngOnInit(): void {
+        this.setCourses();
+    }
+    private setCourses() {
+        this.coursesService.getCourses().subscribe(
+            (courses: ICourse[]) => this.courses = courses
+        );
     }
 
-    openDialog(): void {
+    public openDialog(): void {
         const dialogRef = this.dialog.open(CreateCourseComponent, {
             panelClass: 'modal-create-course',
             data: {name: this.courseName}
         });
 
         dialogRef.afterClosed().subscribe((modalData: ICourse) => {
-            console.log('The dialog was closed', modalData);
+            this.coursesService.createCourse(modalData).subscribe(
+                (course: ICourse) => this.courses.push(course)
+            );
         });
     }
 

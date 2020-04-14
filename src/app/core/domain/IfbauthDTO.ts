@@ -1,4 +1,4 @@
-export interface IFBResponseDTO {
+export interface IFBAuthDTO {
     email: string;
     displayName: string;
     idToken: string;

@@ -6,7 +6,8 @@ import { IEnvironment } from './ienvironment';
 
 export const environment: IEnvironment = {
     production: false,
-    firebaseApiKey: 'AIzaSyDUrQyBISxuWl6P-jmeQm6aUYwGBfhOt4I'
+    firebaseApiKey: 'AIzaSyDUrQyBISxuWl6P-jmeQm6aUYwGBfhOt4I',
+    firebaseDbUrl: 'https://backhealth-94181.firebaseio.com'
 };
 
 /*

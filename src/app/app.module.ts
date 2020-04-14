@@ -1,10 +1,17 @@
 import { BrowserModule } from '@angular/platform-browser';
-import { NgModule } from '@angular/core';
+import { NgModule, Provider } from '@angular/core';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
-import { HttpClientModule } from '@angular/common/http';
+import { HTTP_INTERCEPTORS, HttpClientModule } from '@angular/common/http';
 
 import { AppRoutingModule } from './app-routing.module';
 import { MainComponent } from './layouts/main/main.component';
+import { AuthInterceptor } from './core/interceptors/auth.interceptor';
+
+const INTERCEPTORS: Provider[] = [{
+    provide: HTTP_INTERCEPTORS,
+    multi: true,
+    useClass: AuthInterceptor
+}];
 
 @NgModule({
     declarations: [
@@ -16,7 +23,7 @@ import { MainComponent } from './layouts/main/main.component';
         BrowserAnimationsModule,
         HttpClientModule
     ],
-    providers: [],
+    providers: [...INTERCEPTORS],
     bootstrap: [MainComponent]
 })
 export class AppModule { }

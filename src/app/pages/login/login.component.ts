@@ -2,9 +2,10 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 
-import { AuthService } from '../../core/services/auth.service';
+import { AuthService } from '../../core/services/auth/auth.service';
 import { IUser } from '../../core/domain/iuser';
 import { ROUTES } from '../../routes.constants';
+import { IFBAuthDTO } from '../../core/domain/IfbauthDTO';
 
 @Component({
     selector: 'app-login',
@@ -36,7 +37,7 @@ export class LoginComponent implements OnInit {
                 email: this.email.value,
                 password: this.password.value
             };
-            this.authService.login(user).subscribe((result: any) => {
+            this.authService.login(user).subscribe((fbAuthDTO: IFBAuthDTO) => {
                 this.router.navigate([ROUTES.COURSES]);
             });
         }
