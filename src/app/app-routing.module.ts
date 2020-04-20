@@ -16,6 +16,10 @@ const routes: Routes = [
     {
         path: ROUTES.COURSES, loadChildren: () => import('./pages/courses/courses.module').then(m => m.CoursesModule),
         /*resolve: {recipes: RecipesResolver}*/
+    },
+    {
+        path: ROUTES.COURSE, loadChildren: () => import('./pages/course/course.module').then(m => m.CourseModule),
+        /*resolve: {recipes: RecipesResolver}*/
     }
 ];
 

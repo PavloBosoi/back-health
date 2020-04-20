@@ -2,6 +2,6 @@
 
 <div class="g-row-no-gap g-wrap g-align-center">
     <div class="g-xl-4 g-no-gap" *ngFor="let course of courses">
-        <a href="#" class="main-course">{{course.name}}</a>
+        <a href="#" [routerLink]="[ROUTES_SLASHED.COURSE, course.id]" class="main-course">{{course.name}}</a>
     </div>
 </div>

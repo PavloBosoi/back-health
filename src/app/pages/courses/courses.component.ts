@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { CreateCourseComponent } from './modals/create-course/create-course.component';
 import { ICourse } from '../../core/domain/icourse';
 import { CoursesService } from '../../core/services/courses/courses.service';
+import { ROUTES_SLASHED } from '../../routes.constants';
 
 @Component({
     selector: 'app-courses',
@@ -11,6 +12,7 @@ import { CoursesService } from '../../core/services/courses/courses.service';
     styleUrls: ['./courses.component.scss']
 })
 export class CoursesComponent implements OnInit {
+    public readonly ROUTES_SLASHED = ROUTES_SLASHED;
     public courses: ICourse[];
     private courseName: string;
 
