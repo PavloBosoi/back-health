@@ -19,7 +19,7 @@ export class TermService {
         });
     }
 
-    private createEmptyTerm(): ITerm {
+    public createEmptyTerm(): ITerm {
         return {
             count: null,
             type: TimeType.DAY

@@ -1,24 +1,20 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ProcedureComponent } from './procedure.component';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatFormFieldModule } from '@angular/material/form-field';
-import { MatInputModule } from '@angular/material/input';
-import { MatSelectModule } from '@angular/material/select';
 
-import { TermComponent } from './term.component';
+import { TermModule } from '../term/term.module';
 
 @NgModule({
-    declarations: [TermComponent],
+    declarations: [ProcedureComponent],
     imports: [
         CommonModule,
         FormsModule,
         ReactiveFormsModule,
         MatFormFieldModule,
-        MatInputModule,
-        MatSelectModule
+        TermModule
     ],
-    exports: [
-        TermComponent
-    ]
+    exports: [ProcedureComponent]
 })
-export class TermModule { }
+export class ProcedureModule { }

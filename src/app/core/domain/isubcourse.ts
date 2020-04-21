@@ -5,5 +5,7 @@ export interface ISubCourse {
     name: string;
     duration: ITerm;
     break?: ITerm;
-    procedures: IProcedure[];
+    procedure: IProcedure;
+    startDate: Date;
+    dates: Date[];
 }

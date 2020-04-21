@@ -1,1 +1,18 @@
-<p>term works!</p>
+<form [formGroup]="termFormGroup">
+    <mat-form-field
+        class="term-field"
+        floatLabel="always">
+        <input [formControl]="termFormGroup.get('count')"
+               matInput
+               [placeholder]="placeholder">
+        <mat-select
+            matSuffix
+            [formControl]="termFormGroup.get('type')"
+            [value]="termTypes[1]"
+        >
+            <mat-option *ngFor="let termType of termTypes" [value]="termType">
+                {{termType}}
+            </mat-option>
+        </mat-select>
+    </mat-form-field>
+</form>

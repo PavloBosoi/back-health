@@ -1,15 +1,23 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
+import { FormGroup } from '@angular/forms';
+
+import { TimeType } from '../../core/domain/enumeration/time-type.enum';
 
 @Component({
-  selector: 'app-term',
-  templateUrl: './term.component.html',
-  styleUrls: ['./term.component.scss']
+    selector: 'app-term',
+    templateUrl: './term.component.html',
+    styleUrls: ['./term.component.scss']
 })
 export class TermComponent implements OnInit {
+    public termTypes = Object.keys(TimeType);
+    @Input()
+    public termFormGroup: FormGroup;
+    @Input()
+    public placeholder = 'count';
 
-  constructor() { }
+    constructor() { }
 
-  ngOnInit(): void {
-  }
-
+    ngOnInit(): void {
+        console.log(this.termFormGroup);
+    }
 }

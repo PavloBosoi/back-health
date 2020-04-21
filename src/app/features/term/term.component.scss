@@ -1,0 +1,9 @@
+.term-field{
+    display: flex;
+    ::ng-deep  .mat-form-field-infix{
+        width: 70%;
+    }
+    ::ng-deep .mat-form-field-suffix{
+        width: 30%;
+    }
+}
