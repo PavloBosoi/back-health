@@ -5,9 +5,9 @@
         </mat-expansion-panel-header>
         <div>duration of sub-course: {{subCourse.duration.count}} {{subCourse.duration.type}}</div>
         <div>break between sub-courses: {{subCourse.break.count}} {{subCourse.break.type}}</div>
-        <div>count of procedure: {{subCourse.procedure.count.count}} {{subCourse.procedure.count.type}}</div>
+        <div>count of procedure per: {{subCourse.procedure.count.count}} {{subCourse.procedure.count.type}}</div>
         <div>break between procedures: {{subCourse.procedure.break.count}} {{subCourse.procedure.break.type}}</div>
-        <mat-calendar #calendar (selectedChange)="select($event,calendar)" [dateClass]="dateClass(subCourse)"></mat-calendar>
+        <div class="calendar"><mat-calendar #calendar (selectedChange)="select($event,calendar)" [dateClass]="dateClass(subCourse)"></mat-calendar></div>
     </mat-expansion-panel>
 </mat-accordion>
 <br/><br/><br/><br/>

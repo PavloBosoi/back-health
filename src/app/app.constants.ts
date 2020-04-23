@@ -3,3 +3,5 @@ export const FB = {
     EXPIRE_DATE: 'fb-expire-date'
 };
 
+export const WEEK_DAYS_COUNT = 7;
+export const MONTH_DAYS_COUNT = 31;

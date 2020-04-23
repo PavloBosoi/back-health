@@ -7,5 +7,7 @@ export interface ISubCourse {
     break?: ITerm;
     procedure: IProcedure;
     startDate: Date;
+    endDate: Date;
     dates: Date[];
+    completedDates: Date[];
 }
