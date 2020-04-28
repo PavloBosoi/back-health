@@ -1,8 +1,10 @@
-<form [formGroup]="termFormGroup">
+<form [formGroup]="termFormGroup" *ngIf="isShowing">
     <mat-form-field
         class="term-field"
         floatLabel="always">
         <input [formControl]="termFormGroup.get('count')"
+               [required]="isShowing"
+               appOnlyNumbers
                matInput
                [placeholder]="placeholder">
         <mat-select
@@ -14,5 +16,7 @@
                 {{termType}}
             </mat-option>
         </mat-select>
+        <mat-error *ngIf="termFormGroup.get('count').hasError('required')">Required field</mat-error>
+        <mat-error *ngIf="termFormGroup.get('count').hasError('procedureBreak')">Put the correct value</mat-error>
     </mat-form-field>
 </form>

@@ -5,8 +5,8 @@
         </mat-expansion-panel-header>
         <div>duration of sub-course: {{subCourse.duration.count}} {{subCourse.duration.type}}</div>
         <div>break between sub-courses: {{subCourse.break.count}} {{subCourse.break.type}}</div>
-        <div>count of procedure per: {{subCourse.procedure.count.count}} {{subCourse.procedure.count.type}}</div>
-        <div>break between procedures: {{subCourse.procedure.break.count}} {{subCourse.procedure.break.type}}</div>
+        <div>count of procedure per: {{subCourse.procedureCount.count}} {{subCourse.procedureCount.type}}</div>
+        <div>break between procedures: {{subCourse.procedureBreak.count}} {{subCourse.procedureBreak.type}}</div>
         <div class="calendar"><mat-calendar #calendar (selectedChange)="select($event,calendar)" [dateClass]="dateClass(subCourse)"></mat-calendar></div>
     </mat-expansion-panel>
 </mat-accordion>
@@ -20,6 +20,7 @@
         <form class="example-form" [formGroup]="subCourseFormGroup" (submit)="submitForm()">
             <mat-form-field class="example-full-width">
                 <input matInput
+                       required
                        placeholder="subCourseName"
                        formControlName="name"
                 >
@@ -28,17 +29,25 @@
                 [termFormGroup]="subCourseFormGroup.get('duration')"
                 [placeholder]="'duration of sub-course'"
             ></app-term>
-            <app-term
-                [termFormGroup]="subCourseFormGroup.get('break')"
-                [placeholder]="'break between sub-courses'"
+            <app-term [termFormGroup]="subCourseFormGroup.get('break')"
+                      [placeholder]="'break between sub-courses'"
+                      [isShowing]="!!subCourses.length"
             ></app-term>
-            <app-procedure
-                [procedureFormGroup]="subCourseFormGroup.get('procedure')"
-            ></app-procedure>
-            <mat-form-field class="glp-xl-6 glp-sm-12">
+            <app-term
+                [termFormGroup]="subCourseFormGroup.get('procedureCount')"
+                [placeholder]="'count of procedure per'"
+            ></app-term>
+            <app-term [termFormGroup]="subCourseFormGroup.get('procedureBreak')"
+                      [placeholder]="'break between procedures'"
+                      [isShowing]="subCourseFormGroup.get('procedureCount').value['count'] > 1"
+                      [termTypes]="getTermTypes(subCourseFormGroup.get('procedureCount').value)"
+                      [validators]="procedureBreakValidators"
+            ></app-term>
+            <mat-form-field class="glp-xl-6 glp-sm-12" *ngIf="!subCourses.length">
                 <input readonly
                        required
                        matInput
+                       [matDatepickerFilter]="myFilter"
                        [matDatepicker]="datePickerStartDate"
                        formControlName="startDate"
                        placeholder="Start at">
@@ -46,8 +55,9 @@
                                        [hidden]="false">
                 </mat-datepicker-toggle>
                 <mat-datepicker #datePickerStartDate></mat-datepicker>
+                <mat-error *ngIf="subCourseFormGroup.get('startDate').invalid">Required field</mat-error>
             </mat-form-field>
-            <button type="submit" mat-raised-button color="primary">SAVE</button>
+            <button [disabled]="subCourseFormGroup.invalid" type="submit" mat-raised-button color="primary">SAVE</button>
         </form>
     </mat-card-content>
 </mat-card>

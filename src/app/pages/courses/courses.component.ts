@@ -3,7 +3,7 @@ import { MatDialog } from '@angular/material/dialog';
 
 import { CreateCourseComponent } from './modals/create-course/create-course.component';
 import { ICourse } from '../../core/domain/icourse';
-import { CoursesService } from '../../core/services/courses/courses.service';
+import { CoursesService } from '../../shared/services/courses/courses.service';
 import { ROUTES_SLASHED } from '../../routes.constants';
 
 @Component({

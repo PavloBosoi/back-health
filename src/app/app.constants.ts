@@ -5,3 +5,5 @@ export const FB = {
 
 export const WEEK_DAYS_COUNT = 7;
 export const MONTH_DAYS_COUNT = 31;
+
+export const STRING_EMPTY = '';

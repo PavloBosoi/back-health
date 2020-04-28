@@ -1,31 +1,44 @@
-import { Component, OnInit } from '@angular/core';
-import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { ChangeDetectionStrategy, Component, OnDestroy, OnInit } from '@angular/core';
+import { FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
 
-import { TermService } from '../../core/services/term/term.service';
-import { ICourse } from '../../core/domain/icourse';
+import { TermService } from '../../shared/services/term/term.service';
 import { ISubCourse } from '../../core/domain/isubcourse';
-import { ProcedureService } from '../../core/services/procedure/procedure.service';
 import { MatCalendar, MatCalendarCellCssClasses } from '@angular/material/datepicker';
 import { TimeType } from '../../core/domain/enumeration/time-type.enum';
 import { MONTH_DAYS_COUNT, WEEK_DAYS_COUNT } from '../../app.constants';
 import { ITerm } from '../../core/domain/iterm';
+import { procedureBreakValidator } from '../../shared/validators/procedure-break.validator';
+import { takeUntil } from 'rxjs/operators';
+import { Subject } from 'rxjs';
 
 @Component({
     selector: 'app-course',
     templateUrl: './course.component.html',
-    styleUrls: ['./course.component.scss']
+    styleUrls: ['./course.component.scss'],
+    changeDetection: ChangeDetectionStrategy.OnPush
+
 })
-export class CourseComponent implements OnInit {
+export class CourseComponent implements OnInit, OnDestroy {
     public subCourseFormGroup: FormGroup;
     public subCourses: ISubCourse[] = [];
 
+    public procedureBreakFormControl: FormGroup;
+    public procedureBreakValidators: ValidatorFn[];
+
+    private destroyed$ = new Subject<void>();
+
     constructor(
-        private termService: TermService,
-        private procedureService: ProcedureService
+        private termService: TermService
     ) { }
 
     ngOnInit(): void {
         this.initForm();
+        this.updateProcedureBreak();
+    }
+
+    ngOnDestroy(): void {
+        this.destroyed$.next();
+        this.destroyed$.complete();
     }
 
     private initForm() {
@@ -33,27 +46,48 @@ export class CourseComponent implements OnInit {
             name: new FormControl('', [Validators.required]),
             duration: this.termService.createTermFormGroup(),
             break: this.termService.createTermFormGroup(),
-            procedure: this.procedureService.createProcedureFormGroup(),
+            procedureCount: this.termService.createTermFormGroup(),
             startDate: new FormControl('', [Validators.required])
+        });
+        this.procedureBreakFormControl = this.termService.createTermFormGroup();
+        this.subCourseFormGroup.addControl('procedureBreak', this.procedureBreakFormControl);
+        this.procedureBreakValidators = [procedureBreakValidator(this.subCourseFormGroup.get('procedureCount'))];
+    }
+
+    private updateProcedureBreak() {
+        this.subCourseFormGroup.get('procedureCount').valueChanges.pipe(
+            takeUntil(this.destroyed$)
+        ).subscribe(() => {
+            this.procedureBreakFormControl.get('count').updateValueAndValidity();
         });
     }
 
     public submitForm() {
+        // if it is the next subcourse we need calculate its startDate(considering the break)
+        if (this.subCourses.length) {
+            const previousSubCourseEndDate = this.subCourses[this.subCourses.length - 1].endDate;
+            const startDateForCurrentSubCourse = new Date(new Date(previousSubCourseEndDate).setDate(previousSubCourseEndDate.getDate() + +((this.subCourseFormGroup.get('break').value) as ITerm).count));
+            this.subCourseFormGroup.get('startDate').setValue(startDateForCurrentSubCourse);
+        }
+
         const subCourse: ISubCourse = {
             ...this.subCourseFormGroup.value,
             dates: this.getSubCourseDates(this.subCourseFormGroup.value),
             endDate: this.getSubCourseEndDate(this.subCourseFormGroup.value)
         };
         this.subCourses.push(subCourse);
+        // this.subCourseFormGroup.reset();
         console.log(this.subCourses);
+/*        console.log(this.subCourseFormGroup);
+        debugger*/
     }
 
     private getSubCourseDates(subCourse: ISubCourse) {
         const subCourseDates: Date[] = [];
         const subCourseMonthDay: number = subCourse.startDate.getDate();
-        const subCourseProcedureBreakCountDays: number = +subCourse.procedure.break.count;
-        const subCourseProcedureCountDays: number = +subCourse.procedure.count.count;
-        const subCourseProcedureCountType: TimeType = subCourse.procedure.count.type;
+        const subCourseProcedureBreakCountDays: number = +subCourse.procedureBreak.count;
+        const subCourseProcedureCountDays: number = +subCourse.procedureCount.count;
+        const subCourseProcedureCountType: TimeType = subCourse.procedureCount.type;
         let procedureCounter = 0;
         switch (subCourseProcedureCountType) {
             case TimeType.DAY:
@@ -77,10 +111,10 @@ export class CourseComponent implements OnInit {
                 }
                 break;
             case TimeType.MONTH:
-                console.log('getSubCourseDuration', this.getSubCourseDuration(subCourse.duration));
+                // console.log('getSubCourseDuration', this.getSubCourseDuration(subCourse.duration));
                 // add 1 day for break correct date
                 for (let i = 0; i < this.getSubCourseDuration(subCourse.duration); i += subCourseProcedureBreakCountDays + 1) {
-                    console.log(procedureCounter, subCourseProcedureCountDays, i);
+                    // console.log(procedureCounter, subCourseProcedureCountDays, i);
                     if (procedureCounter === subCourseProcedureCountDays) {
                         // week days - current iteration break - (all procedure days + all break days)
                         i += MONTH_DAYS_COUNT - (subCourseProcedureBreakCountDays + 1) - (subCourseProcedureCountDays + subCourseProcedureBreakCountDays * subCourseProcedureCountDays);
@@ -153,4 +187,23 @@ export class CourseComponent implements OnInit {
         };
     }
 
+    public getTermTypes(countPerPeriod: ITerm) {
+        if (countPerPeriod.count > 1) {
+            switch (countPerPeriod.type) {
+                case TimeType.WEEK:
+                    return [TimeType.DAY];
+                case TimeType.MONTH:
+                    return [TimeType.DAY, TimeType.WEEK];
+            }
+        }
+    }
+
+    myFilter = (d: Date): boolean => {
+        if (this.subCourses && this.subCourses.length) {
+            for (const subCourse of this.subCourses) {
+                return !subCourse.dates.some((date: Date) => date.getTime() === d.getTime());
+            }
+        }
+        return true;
+    }
 }

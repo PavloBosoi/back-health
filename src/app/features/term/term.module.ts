@@ -6,9 +6,13 @@ import { MatInputModule } from '@angular/material/input';
 import { MatSelectModule } from '@angular/material/select';
 
 import { TermComponent } from './term.component';
+import { OnlyNumbersDirective } from '../../shared/directives/numbers-only.directives';
 
 @NgModule({
-    declarations: [TermComponent],
+    declarations: [
+        TermComponent,
+        OnlyNumbersDirective
+    ],
     imports: [
         CommonModule,
         FormsModule,

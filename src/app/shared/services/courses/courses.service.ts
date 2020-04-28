@@ -3,9 +3,9 @@ import { HttpClient } from '@angular/common/http';
 import { map, take } from 'rxjs/operators';
 import { Observable } from 'rxjs';
 
-import { ICourse } from '../../domain/icourse';
+import { ICourse } from '../../../core/domain/icourse';
 import { environment } from '../../../../environments/environment';
-import { IFBCourseDTO } from '../../domain/IfbcourseDTO';
+import { IFBCourseDTO } from '../../../core/domain/IfbcourseDTO';
 
 @Injectable({
     providedIn: 'root'
