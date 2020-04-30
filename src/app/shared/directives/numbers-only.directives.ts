@@ -10,7 +10,7 @@ export class OnlyNumbersDirective {
     @Input('appOnlyNumbers')
     someValue: boolean; // directive input value
 
-    constructor(private el: ElementRef, private control: NgControl) {}
+    constructor(private element: ElementRef, private control: NgControl) {}
 
     @HostListener('input')
     onInput() {
@@ -20,11 +20,11 @@ export class OnlyNumbersDirective {
     private setValueToElement() {
         this.control.control
             ? this.control.control.setValue(this.checkNumber(this.control.control.value))
-            : (this.el.nativeElement.value = this.checkNumber(this.el.nativeElement.value));
+            : this.element.nativeElement.value = this.checkNumber(this.element.nativeElement.value);
     }
 
     private checkNumber(value: string): string {
-        const regex = /\d*/g;
+        const regex = /\d{1,3}/g; // any no more than 3 numbers
         const match = value.match(regex) ? value.match(regex)[0] : STRING_EMPTY;
         return value ? match : STRING_EMPTY;
     }

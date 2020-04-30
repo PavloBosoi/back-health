@@ -10,24 +10,28 @@ import { TimeType } from '../../core/domain/enumeration/time-type.enum';
     changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class TermComponent implements OnInit {
-    public termTypes = Object.keys(TimeType);
-    public isShowing = true;
+    public termTypesInput: string[] = null;
+    public isShowingInput: boolean = null;
     @Input()
     public termFormGroup: FormGroup;
     @Input()
     public validators: ValidatorFn[] = [];
     @Input()
     public placeholder = 'count';
-    @Input('isShowing')
-    set ShowComp(isShowing: boolean) {
-        this.isShowing = isShowing;
+    @Input()
+    set isShowing(isShowing: boolean) {
+        this.isShowingInput = isShowing;
         this.setValidatorsToControl(); // set validators when component is created
     }
-    @Input('termTypes')
-    set TermTypes(termTypes: string[]) {
-        if (termTypes) {
-            this.termTypes = termTypes;
-        }
+    get isShowing(): boolean {
+        return this.isShowingInput !== null ? this.isShowingInput : true;
+    }
+    @Input()
+    set termTypes(termTypes: string[]) {
+        this.termTypesInput = termTypes;
+    }
+    get termTypes(): string[] {
+        return this.termTypesInput || Object.keys(TimeType);
     }
 
     constructor() { }

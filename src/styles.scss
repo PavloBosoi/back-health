@@ -19,6 +19,20 @@ body { margin: 0; font-family: Roboto, "Helvetica Neue", sans-serif; }
     background-color: red;
     border-radius: 50%;
 }
+.completed-date {
+    .mat-calendar-body-cell-content{
+        &::before{
+            content: '';
+            width: 20px;
+            height: 20px;
+            background-color: green;
+            border-radius: 50%;
+            position: absolute;
+            top: -5px;
+            right: -5px;
+        }
+    }
+}
 .calendar{
     width: 50%;
 }

@@ -17,6 +17,7 @@ export function procedureBreakValidator(procedurePerPeriod: AbstractControl): Va
                 termDaysCount = MONTH_DAYS_COUNT;
                 break;
         }
+        // check if (procedure break + procedure count per period) is no more than procedure period
         if (control.value && procedurePerPeriod.value && ((procedurePerPeriodCount + +control.value * procedurePerPeriodCount) > termDaysCount)) {
             return { procedureBreak: { valid: false, value: control.value } };
         }
