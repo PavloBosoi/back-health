@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { MatDialog } from '@angular/material/dialog';
 
 import { CreateCourseComponent } from './modals/create-course/create-course.component';
-import { ICourse } from '../../core/domain/icourse';
+import { ICourse } from '../../core/domain/models/course.model';
 import { CoursesService } from '../../shared/services/courses/courses.service';
 import { ROUTES_SLASHED } from '../../routes.constants';
 
@@ -13,7 +13,7 @@ import { ROUTES_SLASHED } from '../../routes.constants';
 })
 export class CoursesComponent implements OnInit {
     public readonly ROUTES_SLASHED = ROUTES_SLASHED;
-    public courses: ICourse[];
+    public courses: ICourse[] = [];
     private courseName: string;
 
     constructor(

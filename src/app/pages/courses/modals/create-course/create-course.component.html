@@ -1,11 +1,15 @@
-<h1 mat-dialog-title>Title</h1>
+<h1 mat-dialog-title>Create course</h1>
 <div mat-dialog-content>
-    <p>Course name?</p>
-    <mat-form-field>
-        <input matInput [(ngModel)]="modalData.name">
-    </mat-form-field>
-</div>
-<div mat-dialog-actions>
-    <button mat-button (click)="closeDialog()">Cancel</button>
-    <button mat-button [mat-dialog-close]="modalData" cdkFocusInitial>Ok</button>
+    <form [formGroup]="createCourseFormGroup" (submit)="submitForm()">
+        <mat-form-field>
+            <input matInput
+                   placeholder="Course name?"
+                   formControlName="name"
+            >
+        </mat-form-field>
+        <div>
+            <button mat-button (click)="closeDialog()">Cancel</button>
+            <button type="submit" mat-button cdkFocusInitial>Create</button>
+        </div>
+    </form>
 </div>

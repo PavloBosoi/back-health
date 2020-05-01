@@ -1,5 +1,5 @@
 <mat-accordion multi>
-    <mat-expansion-panel *ngFor="let subCourse of subCourses; let i = index" [expanded]="i === subCourses.length - 1">
+    <mat-expansion-panel *ngFor="let subCourse of course.subCourses; let i = index" [expanded]="i === course.subCourses.length - 1">
         <mat-expansion-panel-header>
             <mat-panel-title>{{subCourse.name}}</mat-panel-title>
         </mat-expansion-panel-header>
@@ -31,7 +31,7 @@
             ></app-term>
             <app-term [termFormGroup]="subCourseFormGroup.get('break')"
                       [placeholder]="'break between sub-courses'"
-                      [isShowing]="!!subCourses.length"
+                      [isShowing]="!!course.subCourses.length"
             ></app-term>
             <app-term
                 [termFormGroup]="subCourseFormGroup.get('procedureCount')"
@@ -43,9 +43,9 @@
                       [termTypes]="getTermTypes(subCourseFormGroup.get('procedureCount').value)"
                       [validators]="procedureBreakValidators"
             ></app-term>
-            <mat-form-field class="glp-xl-6 glp-sm-12" *ngIf="!subCourses.length">
+            <mat-form-field class="glp-xl-6 glp-sm-12" *ngIf="!course.subCourses.length">
                 <input readonly
-                       [required]="!subCourses.length"
+                       [required]="!course.subCourses.length"
                        matInput
                        [matDatepickerFilter]="myFilter"
                        [matDatepicker]="datePickerStartDate"

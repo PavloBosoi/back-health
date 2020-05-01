@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { MatButtonModule } from '@angular/material/button';
 import { MatDialogModule } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -21,7 +21,8 @@ import { A11yModule } from '@angular/cdk/a11y';
         MatDialogModule,
         MatFormFieldModule,
         MatInputModule,
-        A11yModule
+        A11yModule,
+        ReactiveFormsModule
     ]
 })
 export class CoursesModule { }

@@ -11,3 +11,15 @@ export interface ISubCourse {
     dates: Date[];
     completedDates: Date[];
 }
+
+export interface ISubCourseDTO {
+    name: string;
+    duration: ITerm;
+    break?: ITerm;
+    procedureCount: ITerm;
+    procedureBreak?: ITerm;
+    startDate: string;
+    endDate: string;
+    dates: string[];
+    completedDates: string[];
+}
