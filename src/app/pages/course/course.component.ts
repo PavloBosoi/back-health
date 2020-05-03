@@ -207,37 +207,6 @@ export class CourseComponent implements OnInit, OnDestroy {
         }
     }
 
-    public setCompleteDates(event: Date, calendar: MatCalendar<Date>, subCourse: ISubCourse) {
-        if (!this.isSameDate(subCourse.completedDates, event)) {
-            subCourse.completedDates.push(event);
-        } else {
-            subCourse.completedDates.splice(this.getDateIndex(subCourse.completedDates, event), 1);
-        }
-        calendar.updateTodaysDate();
-    }
-
-    private isSameDate(dates: Date[], compareDate: Date): boolean {
-        return dates.some((date: Date) => date.getTime() === compareDate.getTime());
-    }
-
-    private getDateIndex(dates: Date[], searchDate: Date): number {
-        return dates.findIndex((date: Date) => date.getTime() === searchDate.getTime());
-    }
-
-    public getDateClass(subCourse: ISubCourse): MatCalendarCellCssClasses {
-        return (calendarDate: Date): MatCalendarCellCssClasses => {
-            const subCourseDatesClass = this.isSameDate(subCourse.dates, calendarDate) ? 'special-date' : STRING_EMPTY;
-            const subCourseCompletedDatesClass = this.isSameDate(subCourse.completedDates, calendarDate) ? 'completed-date' : STRING_EMPTY;
-            return [subCourseDatesClass, subCourseCompletedDatesClass];
-        };
-    }
-
-    public getDisabledDates(subCourse: ISubCourse) {
-        return (calendarDate: Date): boolean => {
-            return this.isSameDate(subCourse.dates, calendarDate);
-        };
-    }
-
     public getTermTypes(countPerPeriod: ITerm) {
         if (countPerPeriod.count > 1) {
             switch (countPerPeriod.type) {

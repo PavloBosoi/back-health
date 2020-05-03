@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { map, take } from 'rxjs/operators';
 import { Observable } from 'rxjs';
+import { UUID } from 'angular2-uuid';
 
 import { Course, ICourse, ICourseDTO } from '../../../core/domain/models/course.model';
 import { environment } from '../../../../environments/environment';
@@ -51,12 +52,22 @@ export class CoursesService {
         );
     }
 
+    public deleteCourse(course: ICourse): Observable<ICourseDTO> {
+        return this.http.delete<ICourseDTO>(`${this.DBUrl}/courses/${course.id}.json`).pipe(
+            take(1)
+        );
+    }
+
     private convertSubCoursesArrayFromServer(subCourses: ISubCourseDTO[]): ISubCourse[] {
-        return subCourses.map((subCourse: ISubCourseDTO) => this.convertSubCourseFromServer(subCourse));
+        if (subCourses) {
+            return subCourses.map((subCourse: ISubCourseDTO) => this.convertSubCourseFromServer(subCourse));
+        }
+        return null;
     }
 
     private convertSubCourseFromServer(subCourse: ISubCourseDTO): ISubCourse {
         const convertedSubCourse: ISubCourse = Object.assign({}, subCourse, {
+            id: subCourse.id ? subCourse.id : this.generateRandomId(),
             startDate: new Date(subCourse.startDate),
             endDate: new Date(subCourse.endDate),
             dates: this.stringsArrayToDateArray(subCourse.dates),
@@ -67,5 +78,9 @@ export class CoursesService {
 
     private stringsArrayToDateArray(stringDates: string[]): Date[] {
         return stringDates ? stringDates.map((stringDate: string) => new Date(stringDate)) : [];
+    }
+
+    private generateRandomId() {
+        return UUID.UUID();
     }
 }

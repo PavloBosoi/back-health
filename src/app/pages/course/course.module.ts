@@ -12,6 +12,7 @@ import { MatNativeDateModule } from '@angular/material/core';
 import { CourseComponent } from './course.component';
 import { CourseRoutingModule } from './course-routing.module';
 import { TermModule } from '../../features/term/term.module';
+import { SubcourseCalendarModule } from '../../shared/components/subcourse-calendar/subcourse-calendar.module';
 
 @NgModule({
     declarations: [CourseComponent],
@@ -24,10 +25,9 @@ import { TermModule } from '../../features/term/term.module';
         MatFormFieldModule,
         MatInputModule,
         MatButtonModule,
-        MatExpansionModule,
         MatDatepickerModule,
-        MatNativeDateModule,
-        TermModule
+        TermModule,
+        SubcourseCalendarModule
     ]
 })
 export class CourseModule { }

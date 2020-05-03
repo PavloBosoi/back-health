@@ -1,15 +1,4 @@
-<mat-accordion multi>
-    <mat-expansion-panel *ngFor="let subCourse of course.subCourses; let i = index" [expanded]="i === course.subCourses.length - 1">
-        <mat-expansion-panel-header>
-            <mat-panel-title>{{subCourse.name}}</mat-panel-title>
-        </mat-expansion-panel-header>
-        <div>duration of sub-course: {{subCourse.duration.count}} {{subCourse.duration.type}}</div>
-        <div>break between sub-courses: {{subCourse.break.count}} {{subCourse.break.type}}</div>
-        <div>count of procedure per: {{subCourse.procedureCount.count}} {{subCourse.procedureCount.type}}</div>
-        <div>break between procedures: {{subCourse.procedureBreak.count}} {{subCourse.procedureBreak.type}}</div>
-        <div class="calendar"><mat-calendar #calendar (selectedChange)="setCompleteDates($event,calendar,subCourse)" [dateFilter]="getDisabledDates(subCourse)" [dateClass]="getDateClass(subCourse)"></mat-calendar></div>
-    </mat-expansion-panel>
-</mat-accordion>
+<app-subcourse-calendar></app-subcourse-calendar>
 <br/><br/><br/><br/>
 <mat-card class="example-card" *ngIf="subCourseFormGroup">
     <mat-card-header>

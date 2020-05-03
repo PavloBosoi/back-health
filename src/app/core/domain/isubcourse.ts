@@ -1,6 +1,7 @@
 import { ITerm } from './iterm';
 
 export interface ISubCourse {
+    id: string;
     name: string;
     duration: ITerm;
     break?: ITerm;
@@ -13,6 +14,7 @@ export interface ISubCourse {
 }
 
 export interface ISubCourseDTO {
+    id: string;
     name: string;
     duration: ITerm;
     break?: ITerm;
