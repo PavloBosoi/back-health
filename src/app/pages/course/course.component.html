@@ -1,4 +1,7 @@
-<app-subcourse-calendar></app-subcourse-calendar>
+<app-subcourse-calendar
+    (delete)="deleteSubCourseById($event)"
+    (edit)="editSubCourseById($event)"
+></app-subcourse-calendar>
 <br/><br/><br/><br/>
 <mat-card class="example-card" *ngIf="subCourseFormGroup">
     <mat-card-header>
@@ -20,7 +23,7 @@
             ></app-term>
             <app-term [termFormGroup]="subCourseFormGroup.get('break')"
                       [placeholder]="'break between sub-courses'"
-                      [isShowing]="!!course.subCourses.length"
+                      [isShowing]="currentSubCourseIndex > 0"
             ></app-term>
             <app-term
                 [termFormGroup]="subCourseFormGroup.get('procedureCount')"

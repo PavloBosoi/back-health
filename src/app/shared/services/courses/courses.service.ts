@@ -7,6 +7,7 @@ import { UUID } from 'angular2-uuid';
 import { Course, ICourse, ICourseDTO } from '../../../core/domain/models/course.model';
 import { environment } from '../../../../environments/environment';
 import { ISubCourse, ISubCourseDTO } from '../../../core/domain/isubcourse';
+import { TermService } from '../term/term.service';
 
 @Injectable({
     providedIn: 'root'
@@ -14,11 +15,14 @@ import { ISubCourse, ISubCourseDTO } from '../../../core/domain/isubcourse';
 export class CoursesService {
     private readonly DBUrl = `${environment.firebaseDbUrl}`;
 
-    constructor(private http: HttpClient) { }
+    constructor(
+        private http: HttpClient,
+        private termService: TermService
+    ) { }
 
     public createCourse(course: ICourse): Observable<ICourse> {
-        return this.http.post<ICourse>(`${this.DBUrl}/courses.json`, course).pipe(
-            map((fbCourseDTO: ICourse) => new Course(course.name, fbCourseDTO.name, course.subCourses)),
+        return this.http.post<ICourseDTO>(`${this.DBUrl}/courses.json`, course).pipe(
+            map((fbCourseDTO: ICourseDTO) => new Course(course.name, fbCourseDTO.name, course.subCourses)),
             take(1)
         );
     }
@@ -39,15 +43,18 @@ export class CoursesService {
 
     public getCourseById(id: string): Observable<ICourse> {
         return this.http.get<ICourseDTO>(`${this.DBUrl}/courses/${id}.json`).pipe(
-            map((course: ICourseDTO) => {
-                return new Course(course.name, id, this.convertSubCoursesArrayFromServer(course.subCourses));
+            map((fbCourseDTO: ICourseDTO) => {
+                return new Course(fbCourseDTO.name, id, this.convertSubCoursesArrayFromServer(fbCourseDTO.subCourses));
             }),
             take(1)
         );
     }
 
-    public updateCourse(course: ICourse): Observable<ICourseDTO> {
-        return this.http.patch<ICourseDTO>(`${this.DBUrl}/courses/${course.id}.json`, course).pipe(
+    public updateCourse(course: ICourse): Observable<ICourse> {
+        return this.http.patch<ICourseDTO>(`${this.DBUrl}/courses/${course.id}.json`, this.addRandomIdToSubCourses(course)).pipe(
+            map((fbCourseDTO: ICourseDTO) =>
+                new Course(fbCourseDTO.name, fbCourseDTO.id, this.convertSubCoursesArrayFromServer(fbCourseDTO.subCourses))
+            ),
             take(1)
         );
     }
@@ -68,6 +75,9 @@ export class CoursesService {
     private convertSubCourseFromServer(subCourse: ISubCourseDTO): ISubCourse {
         const convertedSubCourse: ISubCourse = Object.assign({}, subCourse, {
             id: subCourse.id ? subCourse.id : this.generateRandomId(),
+            break: this.termService.createTerm(subCourse.break),
+            procedureBreak: this.termService.createTerm(subCourse.procedureBreak),
+            procedureCount: this.termService.createTerm(subCourse.procedureCount),
             startDate: new Date(subCourse.startDate),
             endDate: new Date(subCourse.endDate),
             dates: this.stringsArrayToDateArray(subCourse.dates),
@@ -78,6 +88,15 @@ export class CoursesService {
 
     private stringsArrayToDateArray(stringDates: string[]): Date[] {
         return stringDates ? stringDates.map((stringDate: string) => new Date(stringDate)) : [];
+    }
+
+    private addRandomIdToSubCourses(course: ICourse): ICourse {
+        if (course.subCourses) {
+            course.subCourses.map((subCourse: ISubCourse) => Object.assign(subCourse, {
+                id: subCourse.id ? subCourse.id : this.generateRandomId()
+            }));
+        }
+        return course;
     }
 
     private generateRandomId() {

@@ -1,6 +1,5 @@
 import { ChangeDetectionStrategy, ChangeDetectorRef, Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, ValidatorFn, Validators } from '@angular/forms';
-import { MatCalendar, MatCalendarCellCssClasses } from '@angular/material/datepicker';
 import { takeUntil } from 'rxjs/operators';
 import { Subject } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
@@ -8,7 +7,7 @@ import { ActivatedRoute } from '@angular/router';
 import { TermService } from '../../shared/services/term/term.service';
 import { ISubCourse } from '../../core/domain/isubcourse';
 import { TimeType } from '../../core/domain/enumeration/time-type.enum';
-import { MONTH_DAYS_COUNT, STRING_EMPTY, WEEK_DAYS_COUNT } from '../../app.constants';
+import { MONTH_DAYS_COUNT, WEEK_DAYS_COUNT } from '../../app.constants';
 import { ITerm } from '../../core/domain/iterm';
 import { procedureBreakValidator } from '../../shared/validators/procedure-break.validator';
 import { ICourse } from '../../core/domain/models/course.model';
@@ -24,6 +23,8 @@ import { CoursesService } from '../../shared/services/courses/courses.service';
 export class CourseComponent implements OnInit, OnDestroy {
     public subCourseFormGroup: FormGroup;
     public course: ICourse = this.route.snapshot.data['course'];
+    public currentSubCourseIndex = null;
+    private currentSubCourse: ISubCourse = null;
 
     public subCourseBreakFormControl: FormGroup;
     public procedureBreakFormControl: FormGroup;
@@ -39,7 +40,7 @@ export class CourseComponent implements OnInit, OnDestroy {
     ) { }
 
     ngOnInit(): void {
-        console.log(this.course);
+        this.setCurrentSubCourseData();
         this.initForm();
         this.updateProcedureBreak();
     }
@@ -47,6 +48,13 @@ export class CourseComponent implements OnInit, OnDestroy {
     ngOnDestroy(): void {
         this.destroyed$.next();
         this.destroyed$.complete();
+    }
+
+    private setCurrentSubCourseData() {
+        // set current index for know what subcourse is creating or editing now
+        this.currentSubCourseIndex = this.course.subCourses.length;
+        // empty object for ability to assign form values
+        this.currentSubCourse = {} as ISubCourse;
     }
 
     private initForm() {
@@ -76,22 +84,77 @@ export class CourseComponent implements OnInit, OnDestroy {
     }
 
     public submitForm() {
-        this.setStartDateControl();
-        this.setSubCourseToCurrentCourse();
+        if (!this.isEditMode()) {
+            // push empty object, but it is linked for next manipulations
+            this.course.subCourses.push(this.currentSubCourse);
+        }
+        Object.assign(this.currentSubCourse, this.subCourseFormGroup.value);
+        this.calculateSubCurses(this.currentSubCourseIndex);
+/*        if (Object.keys(this.currentSubCourse).length) {
+            this.recalculateSubCurses(this.currentSubCourseIndex);
+
+        } else {
+            this.setSubCourseToCurrentCourse();
+        }*/
         this.rerenderMainForm();
         this.coursesService.updateCourse(this.course).subscribe((course: any) => {
-            console.log(course);
+            this.setCurrentSubCourseData();
         });
     }
 
-    private setStartDateControl() {
-        // if it is the next subcourse we need calculate its startDate(considering the break)
-        if (this.course.subCourses.length) {
-            const subCourseBreakCountDays: number = this.getTermDaysCount(this.subCourseFormGroup.get('break').value);
-            const previousSubCourseEndDate = this.course.subCourses[this.course.subCourses.length - 1].endDate;
-            const startDateForCurrentSubCourse = new Date(new Date(previousSubCourseEndDate).setDate(previousSubCourseEndDate.getDate() + subCourseBreakCountDays));
-            this.subCourseFormGroup.get('startDate').setValue(startDateForCurrentSubCourse);
+    private isEditMode(): boolean {
+        // check if it is not edit mode, cause currentSubCourse setting only when edit
+        return !!Object.keys(this.currentSubCourse).length;
+    }
+
+    private calculateSubCurses(calculatedSubCourseIndex: number) {
+        // get from current index cause before was deleted a course by id
+        const subCoursesForCalculate: ISubCourse[] = this.course.subCourses.slice(calculatedSubCourseIndex);
+
+        for (let i = 0; i < subCoursesForCalculate.length; i++) {
+            const currentSubCourse: ISubCourse = this.course.subCourses[calculatedSubCourseIndex + i];
+            // previous can be not found if it is the first subcourse
+            const previousSubCourse: ISubCourse = this.course.subCourses[calculatedSubCourseIndex - 1 + i] || null;
+            console.log(currentSubCourse, previousSubCourse);
+
+            // startDate must be calculated before because getSubCourseDates and getSubCourseEndDate use startDate
+            subCoursesForCalculate[i].startDate = this.getStartDate(previousSubCourse, currentSubCourse);
+            console.log(this.getStartDate(previousSubCourse, currentSubCourse));
+
+            // get completed date indexes for move them to recalculated dates if exist (order of calculations is important)
+            const completedDateIndexes: number[] = this.getCompletedDateIndexes(subCoursesForCalculate[i]);
+            subCoursesForCalculate[i].dates = this.getSubCourseDates(subCoursesForCalculate[i]);
+
+            Object.assign(subCoursesForCalculate[i], {
+                endDate: this.getSubCourseEndDate(subCoursesForCalculate[i]),
+                completedDates: completedDateIndexes ? completedDateIndexes.map(
+                    (index: number) => subCoursesForCalculate[i].dates[index]
+                ) : []
+            });
         }
+        // reassign subcourses for rerender calendar dates
+        this.course.subCourses = this.course.subCourses.map((subcourse: ISubCourse) => Object.assign({}, subcourse));
+    }
+
+    private getCompletedDateIndexes(subCourseForRecalculate: ISubCourse) {
+        if (subCourseForRecalculate.completedDates) {
+            return subCourseForRecalculate.completedDates.map((completedDate: Date) => {
+                return subCourseForRecalculate.dates.findIndex((date: Date) => {
+                    return date.getTime() === completedDate.getTime();
+                });
+            });
+        }
+        return null;
+    }
+
+    private getStartDate(previousSubCourse: ISubCourse, currentSubCourse: ISubCourse) {
+        // if it is the next subcourse we need calculate its startDate(considering the break)
+        if (this.currentSubCourseIndex > 0) {
+            const subCourseBreakCountDays: number = this.getTermDaysCount(currentSubCourse.break);
+            const startDateForCurrentSubCourse = new Date(new Date(previousSubCourse.endDate).setDate(previousSubCourse.endDate.getDate() + subCourseBreakCountDays));
+            return startDateForCurrentSubCourse;
+        }
+        return (this.subCourseFormGroup.value as ISubCourse).startDate;
     }
 
     private getTermDaysCount(term: ITerm): number {
@@ -106,15 +169,19 @@ export class CourseComponent implements OnInit, OnDestroy {
         }
     }
 
-    private setSubCourseToCurrentCourse() {
+/*    private setSubCourseToCurrentCourse() {
+        // startDate must be calculated before because getSubCourseDates and getSubCourseEndDate use startDate
         const subCourse: ISubCourse = {
             ...this.subCourseFormGroup.value,
-            dates: this.getSubCourseDates(this.subCourseFormGroup.value),
-            endDate: this.getSubCourseEndDate(this.subCourseFormGroup.value),
-            completedDates: []
+            startDate: this.getStartDate(this.course.subCourses[this.course.subCourses.length - 1], this.subCourseFormGroup.value)
         };
+        Object.assign(subCourse, {
+            dates: this.getSubCourseDates(subCourse),
+            endDate: this.getSubCourseEndDate(subCourse),
+            completedDates: []
+        });
         this.course.subCourses.push(subCourse);
-    }
+    }*/
 
     private getSubCourseDates(subCourse: ISubCourse) {
         const subCourseProcedureCountType: TimeType = subCourse.procedureCount.type;
@@ -216,6 +283,25 @@ export class CourseComponent implements OnInit, OnDestroy {
                     return [TimeType.DAY, TimeType.WEEK];
             }
         }
+    }
+
+    public deleteSubCourseById(id: string) {
+        const deleteSubCourseIndex = this.course.subCourses.findIndex((subCourse: ISubCourse) => subCourse.id === id);
+        this.course.subCourses.splice(deleteSubCourseIndex, 1); // delete subcourse
+        // check if exist courses for recalculate, cause deleted course can be the last
+        if (deleteSubCourseIndex < this.course.subCourses.length) {
+            this.calculateSubCurses(deleteSubCourseIndex);
+        }
+        this.coursesService.updateCourse(this.course).subscribe();
+    }
+
+    public editSubCourseById(id: string) {
+        this.currentSubCourse = this.course.subCourses.find((subCourse: ISubCourse) => subCourse.id === id);
+        const formKeys: string[] = Object.keys(this.subCourseFormGroup.controls);
+        formKeys.forEach((key: string) => {
+            this.subCourseFormGroup.get(key).setValue(this.currentSubCourse[key]);
+        });
+        this.currentSubCourseIndex = this.course.subCourses.findIndex((subCourse: ISubCourse) => subCourse.id === id);
     }
 
     myFilter = (d: Date): boolean => {

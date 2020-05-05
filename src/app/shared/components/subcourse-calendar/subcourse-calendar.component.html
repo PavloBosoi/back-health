@@ -3,7 +3,9 @@
         <mat-expansion-panel-header>
             <mat-panel-title>{{subCourse.name}}</mat-panel-title>
         </mat-expansion-panel-header>
-        <button type="button" mat-raised-button color="primary">Edit</button>
+        <button type="button" mat-raised-button color="primary"
+                (click)="editSubCourse(subCourse.id)"
+        >Edit</button>
         <button type="button" mat-raised-button color="primary"
                 [disabled]="i === 0 && course.subCourses.length > 1"
                 (click)="deleteSubCourse(subCourse.id)"
